@@ -1,0 +1,37 @@
+{% if $package %}
+package {$package};
+{% endif %}
+
+import {$sourceClass};
+import com.salakheev.shaderbuilderkt.sources.ShaderProgramSources;
+
+class {$className} {
+	enum class Sources(override val vertex: String, override val fragment: String) : ShaderProgramSources {
+        {% loop in $resultBranches as $branch %}
+        SOURCE{$branch.index}("""{$branch.vertex}""","""{$branch.fragment}""")
+        {% onEmpty %}
+        {% divider %},{% enddivider %}
+        {% endloop %};
+	}
+
+    companion object {
+    	{% if ($paramsWithTypes) %}
+        fun get({$paramsWithTypes|join(, )}): ShaderProgramSources {
+            {% loop in $resultBranches as $branch %}
+            if ({$branch.params}) {
+                return Sources.SOURCE{$branch.index};
+            } else
+            {% onEmpty %}
+            {% endloop %}
+            throw IllegalArgumentException();
+        }
+        {% else %}
+        fun get(): ShaderProgramSources {
+            {% loop in $resultBranches as $branch %}
+			return Sources.SOURCE{$branch.index};
+            {% onEmpty %}
+            {% endloop %}
+        }
+        {% endif %}
+	}
+}
