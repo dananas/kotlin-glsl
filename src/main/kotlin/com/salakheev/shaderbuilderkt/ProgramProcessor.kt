@@ -42,6 +42,10 @@ class ProgramProcessor(private val env: ProcessingEnvironment, private val progr
 		processConstructor(programConstructor)
 	}
 
+	fun getPackageName() = programType.getPackageName()
+	fun getClassName() = generatedClassName
+	fun getResult() = chunk.toString()
+
 	private fun getTypeConstructor(type: TypeElement): ExecutableElement {
 		return type.enclosedElements.find { elem -> elem.kind == ElementKind.CONSTRUCTOR } as ExecutableElement
 	}
@@ -135,9 +139,7 @@ class ProgramProcessor(private val env: ProcessingEnvironment, private val progr
 		shaderConstructor.parameters.forEach { shaderParam ->
 			val shaderParamName = shaderParam.simpleName.toString()
 			val programParam = programConstructor.parameters.find { it.simpleName.toString() == shaderParamName }
-			if (programParam == null) {
-				throw IllegalArgumentException("Shader program '$sourceClassName' doesn't have parameter '$shaderParamName' provided in '$shaderClassName'")
-			}
+					?: throw IllegalArgumentException("Shader program '$sourceClassName' doesn't have parameter '$shaderParamName' provided in '$shaderClassName'")
 			if (programParam.asType().toString() != shaderParam.asType().toString()) {
 				throw IllegalArgumentException("Shader program '$sourceClassName' and '$shaderClassName' have different types of '$shaderParamName'")
 			}
@@ -154,10 +156,6 @@ class ProgramProcessor(private val env: ProcessingEnvironment, private val progr
 		}
 		throw Error()
 	}
-
-	fun getPackageName() = programType.getPackageName()
-	fun getClassName() = generatedClassName
-	fun getResult() = chunk.toString()
 
 	private fun TypeElement.getPackageName(): String {
 		if (qualifiedName.contains(".")) {
