@@ -30,7 +30,7 @@ class ShaderBuilderProcessor : AbstractProcessor() {
 	}
 
 	private fun generateProgram(type: TypeElement) {
-		val theme = Theme("/resources/themes", "program")
+		val theme = Theme("/resources/themes", "")
 		val chunk = theme.makeChunk("program")
 		val processor = ProgramProcessor(processingEnv, type, chunk)
 		writeSourceFile(processor.getPackageName(), processor.getClassName(), processor.getResult())
